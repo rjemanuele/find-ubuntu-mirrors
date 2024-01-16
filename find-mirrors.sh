@@ -91,9 +91,18 @@ export -f toAptSource
 testMirror() {
   local url="$1"
   local repoUrl="$url/$URL_PATH"
+  local fudge=0
+
+  if [[ $repoUrl == rsync:* ]] ; then
+    fudge=1
+    repoUrl=http${repoUrl##rsync}
+  fi
 
   checkRepo "$repoUrl" || return $RC_BAD_MIRROR
 
+  if [ $fudge == 1 ]; then
+    echo \# Verified Rsync Url via Http: $repoUrl
+  fi
   toAptSource "$url"
   newline
 }
